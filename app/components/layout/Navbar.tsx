@@ -1,8 +1,63 @@
+"use client";
+
+import { HomeIcon, ListTodo, Plus } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import ThemeToggle from "./Toggle";
+
 export default function Navbar() {
+  const pathname = usePathname();
+  const routeList = [
+    {
+      key: "logo",
+      label: (
+        <button className="cursor-pointer">
+          <HomeIcon className="w-6 h-5" />
+        </button>
+      ),
+      link: "/",
+    },
+    {
+      key: "createTask",
+      label: "Create Task",
+      link: "/task/create",
+      prefixIcon: <Plus className="w-4 h-4" />,
+    },
+
+    {
+      key: "listTask",
+      label: "Tasks",
+      link: "/task/list",
+      prefixIcon: <ListTodo className="w-4 h-4" />,
+    },
+  ];
   return (
     <div className="w-full flex justify-between">
-      <div>Navbar</div>
-      <div>Toggle</div>
+      <div className="flex gap-2">
+        {routeList.map((route) => {
+          const active =
+            pathname === route.link || pathname.startsWith(route.link + "/");
+          return (
+            <div
+              key={route.key}
+              className={`
+                cursor-pointer rounded-xl ${
+                  active ? "bg-[#27272A] text-white" : "bg-[#E7E5E6] text-black"
+                } `}
+            >
+              <Link
+                href={route.link}
+                className="w-fit py-2 px-3 h-full flex justify-center items-center gap-2 "
+              >
+                {route.prefixIcon}
+                {route.label}
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+
+      <ThemeToggle />
     </div>
   );
 }
