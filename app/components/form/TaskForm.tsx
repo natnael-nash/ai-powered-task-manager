@@ -7,7 +7,6 @@ import { Input } from "./Input";
 
 export function TaskForm() {
   const onSubmit = (values: any) => {
-    alert(JSON.stringify(values, undefined, 2));
     const res = fetch("/api/task", { method: "POST", body: values });
   };
 
