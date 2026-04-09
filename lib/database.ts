@@ -32,7 +32,7 @@ export function initializeDb(): void {
           name TEXT NOT NULL,
           password TEXT NOT NULL,
           created TEXT NOT NULL DEFAULT (datetime('now')),
-          modified TEXT NOT NULL DEFAULT (datetime('now')),
+          updated TEXT NOT NULL DEFAULT (datetime('now')),
           deleted TEXT
         )
       `);
@@ -46,7 +46,7 @@ export function initializeDb(): void {
           priority TEXT,
           due_date TEXT,
           created TEXT NOT NULL DEFAULT (datetime('now')),
-          modified TEXT NOT NULL DEFAULT (datetime('now')),
+          updated TEXT NOT NULL DEFAULT (datetime('now')),
           deleted TEXT
         )
       `);
