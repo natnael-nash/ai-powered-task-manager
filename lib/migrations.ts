@@ -9,6 +9,7 @@ export interface Migration {
   down?: (db: Database.Database) => void;
 }
 
+// create schema_version - all other migrations depend on this
 const ensureSchemaVersionTable = (db: Database.Database): void => {
   db.exec(`
       CREATE TABLE IF NOT EXISTS schema_version (
