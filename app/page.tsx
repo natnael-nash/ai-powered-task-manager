@@ -1,6 +1,7 @@
 import { MoveRight } from "lucide-react";
 import { Button } from "./components/common/Button";
 import Link from "next/link";
+import { Intialiize } from "./components/Intialize";
 
 export default function Home() {
   return (
@@ -19,15 +20,7 @@ export default function Home() {
             A Task Manager powered by AI automation and integrations. You can
             interact with the interface or simply use the chat.
           </p>
-          <Link href="/task/create">
-            <Button
-              type="button"
-              label="Start"
-              className="rounded-3xl!"
-              variant="filled"
-              suffixIcon={<MoveRight className="w-4 h-4" />}
-            />
-          </Link>
+          <Intialiize />
         </div>
       </div>
     </div>
