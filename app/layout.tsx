@@ -33,7 +33,7 @@ export default function RootLayout({
         <Navbar />
 
         {/* <div className="my-4"> */}
-        <div className="my-4 w-full h-full min-h-screen flex flex-row bg-[#E7E5E6] rounded-2xl text-black pl-5 pr-2">
+        <div className="my-4 w-full h-full min-h-screen flex flex-col lg:flex-row bg-[#E7E5E6] rounded-2xl text-black pl-5 pr-2">
           <SideNav />
           <div className="flex flex-1  py-2">{children}</div>
         </div>

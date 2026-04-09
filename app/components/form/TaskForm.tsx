@@ -1,125 +1,212 @@
+"use client";
+
 import { BotMessageSquareIcon } from "lucide-react";
 import { Button } from "../common/Button";
+import { Field, Form } from "react-final-form";
+import { Input } from "./Input";
 
 export function TaskForm() {
+  const onSubmit = (values: any) => {
+    alert(JSON.stringify(values, undefined, 2));
+    const res = fetch("/api/task", { method: "POST", body: values });
+  };
+
   return (
     <div className="w-full">
-      <form className="mx-auto w-full rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-zinc-900">
-            Create a Task
-          </h2>
-          <p className="mt-1 text-sm text-zinc-500">
-            Fill in the details for the task you want the agent to manage.
-          </p>
-        </div>
+      <Form
+        onSubmit={onSubmit}
+        initialValues={{ category: "work", priority: "medium" }}
+        // validate={}
+        render={({ handleSubmit }) => (
+          <form
+            className="mx-auto w-full rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+            onSubmit={handleSubmit}
+          >
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold text-zinc-900">
+                Create a Task
+              </h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Fill in the details of the task.
+              </p>
+            </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">
-              Task Title
-            </label>
-            <input
-              type="text"
-              placeholder="Finish project report"
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
-            />
-          </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Field
+                  name="title"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Task Title
+                      </label>
+                      <Input
+                        type="text"
+                        placeholder="Finish project report"
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        inputProps={input}
+                      />
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                    </div>
+                  )}
+                />
+              </div>
 
-          <div className="sm:col-span-1">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">
-              Category
-            </label>
-            <select className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white">
-              <option>Work</option>
-              <option>Personal</option>
-              <option>Study</option>
-              <option>Errand</option>
-              <option>Other</option>
-            </select>
-          </div>
+              <div className="sm:col-span-1">
+                <Field
+                  name="category"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Category
+                      </label>
 
-          <div className="sm:col-span-1">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">
-              Priority
-            </label>
-            <select className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white">
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-              <option>Urgent</option>
-            </select>
-          </div>
+                      <select
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        {...input}
+                      >
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="study">Study</option>
+                        <option value="errand">Errand</option>
+                        <option value="other">Other</option>
+                      </select>
 
-          <div className="sm:col-span-1">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">
-              Due Date
-            </label>
-            <input
-              type="date"
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
-            />
-          </div>
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                    </div>
+                  )}
+                />
+              </div>
 
-          <div className="sm:col-span-1">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">
-              Reminder Time
-            </label>
-            <input
-              type="time"
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
-            />
-          </div>
+              <div className="sm:col-span-1">
+                <Field
+                  name="priority"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Priority
+                      </label>
 
-          <div className="sm:col-span-2">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">
-              Task Description
-            </label>
-            <textarea
-              rows={5}
-              placeholder="Describe what needs to be done..."
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
-            />
-          </div>
+                      <select
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        {...input}
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                      </select>
 
-          <div className="sm:col-span-2">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">
-              Notes / Extra Instructions
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Add any extra details, links, or instructions..."
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
-            />
-          </div>
-        </div>
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                    </div>
+                  )}
+                />
+              </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3">
-          {/* <button
+              <div className="sm:col-span-1">
+                <Field
+                  name="dueDate"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Due Date
+                      </label>
+                      <Input
+                        type="date"
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+
+              <div className="sm:col-span-1">
+                <Field
+                  name="reminderTime"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Reminder Time
+                      </label>
+                      <Input
+                        type="time"
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        inputProps={input}
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <Field
+                  name="description"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Task Description
+                      </label>
+
+                      <Input
+                        type="textarea"
+                        rows={5}
+                        placeholder="Describe what needs to be done..."
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <Field
+                  name="notes"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Notes / Extra Instructions
+                      </label>
+
+                      <Input
+                        type="textarea"
+                        rows={5}
+                        placeholder="Add any extra details, links, or instructions..."
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              {/* <button
             disabled
             type="button"
             className="rounded-xl border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
           >
             Save Draft
           </button> */}
-          {/* <button
+              {/* <button
             disabled
             type="button"
             className="rounded-xl border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 
             flex gap-2 items-center justify-center"
           >
             <BotMessageSquareIcon className="w-4 h-4" />
-            Agent Mode
+            Agentic Mode
           </button> */}
-          <Button
-            type="button"
-            label="Agent Mode"
-            variant="default"
-            prerfixIcon={<BotMessageSquareIcon className="w-4 h-4" />}
-          />
-          <Button type="submit" label="Create Task" variant="filled" />
-        </div>
-      </form>
+              <Button
+                type="button"
+                label="Agentic Mode"
+                variant="default"
+                prerfixIcon={<BotMessageSquareIcon className="w-4 h-4" />}
+              />
+              <Button type="submit" label="Create Task" variant="filled" />
+            </div>
+          </form>
+        )}
+      />
     </div>
   );
 }
