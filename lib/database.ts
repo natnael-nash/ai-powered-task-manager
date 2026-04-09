@@ -6,7 +6,7 @@ import { mkdirSync, existsSync } from "fs";
 import { randomUUID } from "crypto";
 
 export const DATABASES_DIR = join(process.cwd(), "databases");
-const DB_PATH = join(DATABASES_DIR, "database.db");
+export const DB_PATH = join(DATABASES_DIR, "database.db");
 
 export function getDatabasePath(databaseName: string): string {
   const base = databaseName
@@ -39,12 +39,12 @@ export function initializeDb(): void {
 
     // Create users table
     db.exec(`
-        CREATE TABLE IF NOT EXISTS taks (
+        CREATE TABLE IF NOT EXISTS tasks (
           id TEXT PRIMARY KEY,
           title TEXT NOT NULL,
-          cateory TEXT,
+          category TEXT,
           priority TEXT,
-          dueDate TEXT,
+          due_date TEXT,
           created TEXT NOT NULL DEFAULT (datetime('now')),
           modified TEXT NOT NULL DEFAULT (datetime('now')),
           deleted TEXT
