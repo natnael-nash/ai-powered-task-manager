@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import { existsSync } from "fs";
+import { DB_PATH } from "./database";
 
 export interface Migration {
   version: number;
@@ -40,12 +41,39 @@ const recordMigration = (
 };
 
 // list of migrations
-export const tenantMigrations: Migration[] = [];
+export const migrations: Migration[] = [
+  {
+    version: 1,
+    name: "add_columns_description_and_reminder_time_note_to_tasks",
+    up(db) {
+      const tbl = db
+        .prepare(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='tasks'"
+        )
+        .get() as { name?: string } | undefined;
+      if (!tbl?.name) return;
 
-export function runMigrations(
-  dbPath: string,
-  migrations: Migration[]
-): { applied: string[]; error?: string } {
+      const tableInfo = db.prepare("PRAGMA table_info(tasks)").all() as {
+        name: string;
+      }[];
+
+      const newCols = ["description", "reminder_time", "note"];
+
+      newCols.map((col) => {
+        if (!tableInfo.some((c) => c.name === col)) {
+          db.exec(`
+            ALTER TABLE tasks ADD COLUMN ${col} TEXT 
+          `);
+        }
+      });
+      return;
+    },
+  },
+];
+
+export function runMigrations(): { applied: string[]; error?: string } {
+  const dbPath = DB_PATH;
+
   if (!existsSync(dbPath)) {
     return { applied: [], error: `Database not found: ${dbPath}` };
   }
