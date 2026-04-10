@@ -10,17 +10,18 @@ export async function POST(request: NextRequest) {
     title,
     category,
     priority,
-    dueDate,
     description,
+    dueDate,
     reminderTime,
     note,
+    status,
   } = body;
 
   try {
     const id = randomUUID();
     db.prepare(
-      `INSERT INTO tasks (id, title, category, priority, due_date, description, reminder_time, note, created, updated)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+      `INSERT INTO tasks (id, title, category, priority, due_date, description, reminder_time, note, status, created, updated)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
     ).run(
       id,
       title,
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
       dueDate,
       description,
       reminderTime,
-      note
+      note,
+      status
     );
 
     db.close();

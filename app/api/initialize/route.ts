@@ -2,7 +2,7 @@ import { initializeDb } from "@/lib/database";
 import { runMigrations } from "@/lib/migrations";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const intializeDatabse = initializeDb();
     const migrateDb = runMigrations();

@@ -14,22 +14,26 @@ export async function POST(
       title,
       category,
       priority,
-      dueDate,
       description,
+      dueDate,
+      due_date,
       reminderTime,
+      reminder_time,
       note,
+      status,
     } = body;
     db.prepare(
       `UPDATE tasks SET title=?, category=?, priority=?, due_date=?, description=?, reminder_time=?, 
-      note=?, updated=datetime('now') WHERE id = ? `
+      note=?, status=?, updated=datetime('now') WHERE id = ? `
     ).run(
       title,
       category,
       priority,
-      dueDate,
+      dueDate || due_date,
       description,
-      reminderTime,
+      reminderTime || reminder_time,
       note,
+      status,
       id
     );
 

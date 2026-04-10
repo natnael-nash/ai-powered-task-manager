@@ -28,7 +28,13 @@ export function TaskForm({ id }: { id?: string }) {
     });
     if (res.ok && res.status) {
       const data = await res.json();
-      setTask(data.data);
+      const {
+        due_date: dueDate,
+        reminder_time: reminderTime,
+        ...values
+      } = data.data;
+
+      setTask({ dueDate, reminderTime, ...values });
       return;
     }
     toast.error("Filed to get task!");
@@ -132,6 +138,8 @@ export function TaskForm({ id }: { id?: string }) {
                 />
               </div>
 
+              {/* <div className="sm:col-span-2">
+                <div className="grid gap-4 sm:grid-cols-3"> */}
               <div className="sm:col-span-1">
                 <Field
                   name="dueDate"
@@ -168,6 +176,32 @@ export function TaskForm({ id }: { id?: string }) {
                 />
               </div>
 
+              <div className="sm:col-span-1">
+                <Field
+                  name="status"
+                  render={({ input, meta }) => (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-zinc-700">
+                        Task Status
+                      </label>
+
+                      <select
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        {...input}
+                      >
+                        <option value="New">New</option>
+
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                    </div>
+                  )}
+                />
+              </div>
+              {/* </div>
+              </div> */}
               <div className="sm:col-span-2">
                 <Field
                   name="description"

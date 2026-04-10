@@ -69,6 +69,31 @@ export const migrations: Migration[] = [
       return;
     },
   },
+
+  {
+    version: 2,
+    name: "add_column_status_to_tasks",
+    up(db) {
+      const tbl = db
+        .prepare(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='tasks'"
+        )
+        .get() as { name?: string } | undefined;
+      if (!tbl?.name) return;
+
+      const tableInfo = db.prepare("PRAGMA table_info(tasks)").all() as {
+        name: string;
+      }[];
+
+      if (!tableInfo.some((c) => c.name === "status")) {
+        db.exec(`
+            ALTER TABLE tasks ADD COLUMN status TEXT 
+          `);
+      }
+
+      return;
+    },
+  },
 ];
 
 export function runMigrations(): { applied: string[]; error?: string } {
