@@ -94,6 +94,56 @@ export const migrations: Migration[] = [
       return;
     },
   },
+
+  {
+    version: 3,
+    name: "add_column_email_to_users",
+    up(db) {
+      const tbl = db
+        .prepare(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='users'"
+        )
+        .get() as { name?: string } | undefined;
+      if (!tbl?.name) return;
+
+      const tableInfo = db.prepare("PRAGMA table_info(users)").all() as {
+        name: string;
+      }[];
+
+      if (!tableInfo.some((c) => c.name === "email")) {
+        db.exec(`
+            ALTER TABLE users ADD COLUMN email TEXT NOT NULL
+          `);
+      }
+
+      return;
+    },
+  },
+
+  {
+    version: 4,
+    name: "rmove_column_password_from_users",
+    up(db) {
+      const tbl = db
+        .prepare(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='users'"
+        )
+        .get() as { name?: string } | undefined;
+      if (!tbl?.name) return;
+
+      const tableInfo = db.prepare("PRAGMA table_info(users)").all() as {
+        name: string;
+      }[];
+
+      if (tableInfo.some((c) => c.name === "password")) {
+        db.exec(`
+            ALTER TABLE users DROP COLUMN password 
+          `);
+      }
+
+      return;
+    },
+  },
 ];
 
 export function runMigrations(): { applied: string[]; error?: string } {
