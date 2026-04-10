@@ -19,6 +19,7 @@ export default function Navbar() {
         </button>
       ),
       link: "/",
+      openRoute: true,
     },
     {
       key: "createTask",
@@ -49,9 +50,9 @@ export default function Navbar() {
                 } `}
             >
               <Link
-                href={session ? route.link : "#"}
+                href={route.openRoute || session ? route.link : "#"}
                 className="w-fit py-2 px-3 h-full flex justify-center items-center gap-2"
-                title={session ? "" : "Signin first"}
+                title={route.openRoute || session ? "" : "Signin first"}
               >
                 {route.prefixIcon}
                 {route.label}

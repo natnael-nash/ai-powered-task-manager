@@ -84,7 +84,7 @@ export default function LoginComponent() {
     <Button
       type="button"
       label="Sign in"
-      className="rounded-3xl! disabled:cursor-not-allowed!"
+      className="rounded-3xl!   bg-white text-black"
       handleClick={() => signIn()}
     />
   );

@@ -19,7 +19,7 @@ export function TaskForm({ id }: { id?: string }) {
       body: JSON.stringify(values),
     });
     if (res.ok && res.status) return toast("Task created successfully!");
-    toast.error("Something went wrong!");
+    toast.error(res.status == 401 ? "Unauthorized!" : "Something went wrong!");
   };
 
   const getTask = async () => {
@@ -37,7 +37,7 @@ export function TaskForm({ id }: { id?: string }) {
       setTask({ dueDate, reminderTime, ...values });
       return;
     }
-    toast.error("Filed to get task!");
+    toast.error(res.status == 401 ? "Unauthorized!" : "Filed to get task!");
   };
 
   useEffect(() => {
