@@ -1,3 +1,4 @@
+import { registerUser } from "@/lib/register-user";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -8,6 +9,17 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_SECRET as string,
     }),
   ],
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      // console.log(user, account, profile);
+      try {
+        await registerUser(user);
+      } catch (error) {
+        console.log("@here error registering user");
+      }
+      return true;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);
