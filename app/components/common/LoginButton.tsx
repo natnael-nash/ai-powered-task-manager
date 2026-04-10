@@ -28,7 +28,7 @@ export default function LoginComponent() {
                 setOpenMenu(false);
                 setOpenProfile(true);
               }}
-              className="flex w-full items-center rounded-xl px-4 py-3 text-left text-sm text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950"
+              className="cursor-pointer flex w-full items-center rounded-xl px-4 py-3 text-left text-sm text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950"
             >
               Profile
             </button>
@@ -38,7 +38,7 @@ export default function LoginComponent() {
                 setOpenMenu(false);
                 signOut();
               }}
-              className="flex w-full items-center rounded-xl px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50 hover:text-red-700"
+              className="cursor-pointer flex w-full items-center rounded-xl px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50 hover:text-red-700"
             >
               Sign out
             </button>
