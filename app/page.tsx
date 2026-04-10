@@ -1,6 +1,3 @@
-import { MoveRight } from "lucide-react";
-import { Button } from "./components/common/Button";
-import Link from "next/link";
 import { Intialiize } from "./components/Intialize";
 
 export default function Home() {

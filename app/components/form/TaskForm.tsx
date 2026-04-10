@@ -4,26 +4,51 @@ import { BotMessageSquareIcon } from "lucide-react";
 import { Button } from "../common/Button";
 import { Field, Form } from "react-final-form";
 import { Input } from "./Input";
+import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { Task } from "../TaskList";
 
-export function TaskForm() {
-  const onSubmit = (values: any) => {
-    const res = fetch("/api/task", { method: "POST", body: values });
+export function TaskForm({ id }: { id?: string }) {
+  const isEdit = !!id;
+  const [task, setTask] = useState<Task | null>(null);
+
+  const onSubmit = async (values: any) => {
+    const url = isEdit ? `/api/task/${id}` : "/api/task";
+    const res = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+    if (res.ok && res.status) return toast("Task created successfully!");
+    toast.error("Something went wrong!");
   };
+
+  const getTask = async () => {
+    const res = await fetch(`/api/task/${id}`, {
+      method: "GET",
+    });
+    if (res.ok && res.status) {
+      const data = await res.json();
+      setTask(data.data);
+      return;
+    }
+    toast.error("Filed to get task!");
+  };
+
+  useEffect(() => {
+    if (id) getTask();
+  }, [id]);
 
   return (
     <div className="w-full">
       <Form
         onSubmit={onSubmit}
-        initialValues={{ category: "work", priority: "medium" }}
+        initialValues={{ category: "work", priority: "medium", ...task }}
         // validate={}
         render={({ handleSubmit }) => (
-          <form
-            className="mx-auto w-full rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
-            onSubmit={handleSubmit}
-          >
+          <form className="" onSubmit={handleSubmit}>
             <div className="mb-6">
               <h2 className="text-2xl font-semibold text-zinc-900">
-                Create a Task
+                {isEdit ? "Edit" : "Create"} a Task
               </h2>
               <p className="mt-1 text-sm text-zinc-500">
                 Fill in the details of the task.
@@ -34,18 +59,23 @@ export function TaskForm() {
               <div className="sm:col-span-2">
                 <Field
                   name="title"
+                  validate={(value) => (value ? undefined : "Required")}
                   render={({ input, meta }) => (
                     <div>
                       <label className="mb-2 block text-sm font-medium text-zinc-700">
                         Task Title
                       </label>
+                      <span className="text-sm text-red-600">
+                        {meta.touched && meta.error && (
+                          <span>{meta.error}</span>
+                        )}
+                      </span>
                       <Input
                         type="text"
                         placeholder="Finish project report"
                         className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
                         inputProps={input}
                       />
-                      {meta.touched && meta.error && <span>{meta.error}</span>}
                     </div>
                   )}
                 />
@@ -113,6 +143,7 @@ export function TaskForm() {
                       <Input
                         type="date"
                         className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        inputProps={input}
                       />
                     </div>
                   )}
@@ -151,6 +182,7 @@ export function TaskForm() {
                         rows={5}
                         placeholder="Describe what needs to be done..."
                         className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        inputProps={input}
                       />
                     </div>
                   )}
@@ -159,7 +191,7 @@ export function TaskForm() {
 
               <div className="sm:col-span-2">
                 <Field
-                  name="notes"
+                  name="note"
                   render={({ input, meta }) => (
                     <div>
                       <label className="mb-2 block text-sm font-medium text-zinc-700">
@@ -171,6 +203,7 @@ export function TaskForm() {
                         rows={5}
                         placeholder="Add any extra details, links, or instructions..."
                         className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:bg-white"
+                        inputProps={input}
                       />
                     </div>
                   )}
@@ -201,7 +234,11 @@ export function TaskForm() {
                 variant="default"
                 prerfixIcon={<BotMessageSquareIcon className="w-4 h-4" />}
               />
-              <Button type="submit" label="Create Task" variant="filled" />
+              <Button
+                type="submit"
+                label={`${isEdit ? "Save" : "Create"} Task`}
+                variant="filled"
+              />
             </div>
           </form>
         )}

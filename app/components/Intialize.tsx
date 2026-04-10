@@ -12,12 +12,13 @@ export function Intialiize() {
   });
 
   const handleClickInitialize = async () => {
+    if (status.success) return;
     setStatus({
       loading: true,
       success: false,
       message: "",
     });
-    const res = await fetch("/api/intialize", { method: "GET" });
+    const res = await fetch("/api/initialize", { method: "GET" });
     if (res.ok) {
       const { success, message, error } = await res.json();
       setStatus({

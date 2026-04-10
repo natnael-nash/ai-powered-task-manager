@@ -7,9 +7,10 @@ export default function ListCanddiates() {
   return (
     <div className="w-full h-[90vh]">
       <div className="flex justify-end">
-        <Link href="/candidate/create">
+        <Link href="/task/create">
           <Button
             type="button"
+            variant="filled"
             label="Create new"
             prerfixIcon={<UserPlus2 className="w-4 h-4" />}
           />

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/layout/Navbar";
 import SideNav from "./components/layout/SideNav";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +35,13 @@ export default function RootLayout({
 
         {/* <div className="my-4"> */}
         <div className="my-4 w-full h-full min-h-screen flex flex-col lg:flex-row bg-[#E7E5E6] rounded-2xl text-black pl-5 pr-2">
+          <ToastContainer />
           <SideNav />
-          <div className="flex flex-1  py-2">{children}</div>
+          <div className="w-full py-2">
+            <div className="flex flex-1 mx-auto w-full rounded-2xl border border-zinc-200 bg-white p-6 ">
+              {children}
+            </div>
+          </div>
         </div>
       </body>
     </html>
