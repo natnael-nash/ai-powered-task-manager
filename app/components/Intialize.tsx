@@ -3,8 +3,11 @@
 import { CheckCircle, Link, Loader2, MoveRight } from "lucide-react";
 import { Button } from "./common/Button";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import LoginComponent from "./common/LoginButton";
 
 export function Intialiize() {
+  const { data: session } = useSession();
   const [status, setStatus] = useState({
     loading: false,
     success: false,
@@ -36,12 +39,14 @@ export function Intialiize() {
   };
 
   return (
-    <div>
-      {/* <Link href="/task/create"> */}
+    <div className="flex gap-2">
+      {!session && <LoginComponent />}
       <Button
+        disabled={!session}
         type="button"
         label="Start"
-        className="rounded-3xl!"
+        className="rounded-3xl! disabled:cursor-not-allowed!"
+        title={session ? "" : "Signin first"}
         variant="filled"
         suffixIcon={
           status.loading ? (
@@ -54,7 +59,6 @@ export function Intialiize() {
         }
         handleClick={handleClickInitialize}
       />
-      {/* </Link> */}
     </div>
   );
 }

@@ -6,6 +6,7 @@ interface ButtonProps {
   variant?: "default" | "filled" | "primary";
   className?: string;
   label?: string;
+  title?: string;
   prerfixIcon?: ReactElement;
   suffixIcon?: ReactElement;
   handleClick?: () => void;
@@ -16,6 +17,7 @@ export function Button({
   variant,
   className,
   label,
+  title,
   prerfixIcon,
   suffixIcon,
   handleClick,
@@ -24,6 +26,7 @@ export function Button({
     <button
       type={type}
       disabled={disabled}
+      title={title}
       className={`rounded-xl  px-5 py-3 text-sm font-medium  transition 
         flex items-center gap-2 cursor-pointer ${
           variant == "filled"

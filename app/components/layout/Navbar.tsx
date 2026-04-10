@@ -4,8 +4,11 @@ import { HomeIcon, ListTodo, Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./Toggle";
+import LoginComponent from "../common/LoginButton";
+import { useSession } from "next-auth/react";
 
 export default function Navbar() {
+  const { data: session } = useSession();
   const pathname = usePathname();
   const routeList = [
     {
@@ -46,8 +49,9 @@ export default function Navbar() {
                 } `}
             >
               <Link
-                href={route.link}
-                className="w-fit py-2 px-3 h-full flex justify-center items-center gap-2 "
+                href={session ? route.link : "#"}
+                className="w-fit py-2 px-3 h-full flex justify-center items-center gap-2"
+                title={session ? "" : "Signin first"}
               >
                 {route.prefixIcon}
                 {route.label}
@@ -57,7 +61,10 @@ export default function Navbar() {
         })}
       </div>
 
-      <ThemeToggle />
+      <div className="flex">
+        <LoginComponent />
+        <ThemeToggle />
+      </div>
     </div>
   );
 }
