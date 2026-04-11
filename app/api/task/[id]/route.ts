@@ -2,7 +2,7 @@ import { DB_PATH } from "@/lib/database";
 import Database from "better-sqlite3";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(
   request: NextRequest,

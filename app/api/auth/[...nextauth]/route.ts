@@ -1,26 +1,5 @@
-import { registerUser } from "@/lib/register-user";
-import NextAuth, { type NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-
-export const authOptions: NextAuthOptions = {
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID as string,
-      clientSecret: process.env.GOOGLE_SECRET as string,
-    }),
-  ],
-  callbacks: {
-    async signIn({ user, account, profile }) {
-      // console.log(user, account, profile);
-      try {
-        await registerUser(user);
-      } catch (error) {
-        console.log("@here error registering user");
-      }
-      return true;
-    },
-  },
-};
+import { authOptions } from "@/lib/auth";
+import NextAuth from "next-auth";
 
 const handler = NextAuth(authOptions);
 

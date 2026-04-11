@@ -6,7 +6,6 @@ export interface Migration {
   version: number;
   name: string;
   up: (db: Database.Database) => void;
-  /** Optional. If present, allows rolling back this migration. */
   down?: (db: Database.Database) => void;
 }
 
@@ -122,7 +121,7 @@ export const migrations: Migration[] = [
 
   {
     version: 4,
-    name: "rmove_column_password_from_users",
+    name: "remove_column_password_from_users",
     up(db) {
       const tbl = db
         .prepare(

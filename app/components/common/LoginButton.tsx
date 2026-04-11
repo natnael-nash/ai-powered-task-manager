@@ -3,9 +3,11 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "./Button";
 import { useState } from "react";
 import { Modal } from "./Modal";
+import { useRouter } from "next/navigation";
 
 export default function LoginComponent() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [openMenu, setOpenMenu] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
@@ -14,6 +16,11 @@ export default function LoginComponent() {
     if (!name) return "";
     return name?.[0];
   };
+
+  const handleSignin = () => {
+    signIn();
+  };
+
   if (session) {
     return (
       <div
@@ -37,6 +44,9 @@ export default function LoginComponent() {
               onClick={() => {
                 setOpenMenu(false);
                 signOut();
+                setTimeout(() => {
+                  router.push("/");
+                }, 100);
               }}
               className="cursor-pointer flex w-full items-center rounded-xl px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50 hover:text-red-700"
             >
@@ -85,7 +95,7 @@ export default function LoginComponent() {
       type="button"
       label="Sign in"
       className="rounded-3xl!   bg-white text-black"
-      handleClick={() => signIn()}
+      handleClick={handleSignin}
     />
   );
 }

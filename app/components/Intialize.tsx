@@ -5,9 +5,11 @@ import { Button } from "./common/Button";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import LoginComponent from "./common/LoginButton";
+import { useRouter } from "next/navigation";
 
 export function Intialiize() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [status, setStatus] = useState({
     loading: false,
     success: false,
@@ -15,7 +17,7 @@ export function Intialiize() {
   });
 
   const handleClickInitialize = async () => {
-    if (status.success) return;
+    if (status.success && session) return router.push("/task/create");
     setStatus({
       loading: true,
       success: false,
@@ -42,11 +44,9 @@ export function Intialiize() {
     <div className="flex gap-2">
       {!session && <LoginComponent />}
       <Button
-        disabled={!session}
         type="button"
-        label="Start"
+        label={status.success && session ? "Continue" : "Start"}
         className="rounded-3xl! disabled:cursor-not-allowed!"
-        title={session ? "" : "Signin first"}
         variant="filled"
         suffixIcon={
           status.loading ? (

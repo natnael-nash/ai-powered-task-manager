@@ -60,7 +60,6 @@ export default function TaskList() {
         const updateSelected = taskData.filter(
           (task: Task) => task.id == selected.id
         );
-        alert(JSON.stringify(updateSelected));
         setTasks((prev) => ({ ...prev, selected: updateSelected[0] }));
       }
     }
