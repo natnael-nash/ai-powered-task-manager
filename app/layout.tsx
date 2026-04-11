@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "./components/layout/Navbar";
 import SideNav from "./components/layout/SideNav";
 import { ToastContainer } from "react-toastify";
+import { SessionProvider } from "next-auth/react";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,20 +32,22 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col p-5">
-        <Navbar />
-
-        {/* <div className="my-4"> */}
-        <div className="my-4 w-full h-full min-h-screen flex flex-col lg:flex-row bg-[#E7E5E6] rounded-2xl text-black pl-5 pr-2">
+      <Providers>
+        <body className="min-h-full flex flex-col p-5">
           <ToastContainer />
-          <SideNav />
-          <div className="w-full py-2">
-            <div className="flex flex-1 mx-auto w-full rounded-2xl border border-zinc-200 bg-white p-6 ">
-              {children}
+          <Navbar />
+
+          {/* <div className="my-4"> */}
+          <div className="my-4 w-full h-full min-h-screen flex flex-col lg:flex-row bg-[#E7E5E6] rounded-2xl text-black pl-5 pr-2">
+            <SideNav />
+            <div className="w-full py-2">
+              <div className="flex flex-1 mx-auto w-full rounded-2xl border border-zinc-200 bg-white p-6 ">
+                {children}
+              </div>
             </div>
           </div>
-        </div>
-      </body>
+        </body>
+      </Providers>
     </html>
   );
 }

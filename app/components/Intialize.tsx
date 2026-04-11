@@ -3,8 +3,13 @@
 import { CheckCircle, Link, Loader2, MoveRight } from "lucide-react";
 import { Button } from "./common/Button";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import LoginComponent from "./common/LoginButton";
+import { useRouter } from "next/navigation";
 
 export function Intialiize() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [status, setStatus] = useState({
     loading: false,
     success: false,
@@ -12,7 +17,7 @@ export function Intialiize() {
   });
 
   const handleClickInitialize = async () => {
-    if (status.success) return;
+    if (status.success && session) return router.push("/task/create");
     setStatus({
       loading: true,
       success: false,
@@ -36,12 +41,12 @@ export function Intialiize() {
   };
 
   return (
-    <div>
-      {/* <Link href="/task/create"> */}
+    <div className="flex gap-2">
+      {!session && <LoginComponent />}
       <Button
         type="button"
-        label="Start"
-        className="rounded-3xl!"
+        label={status.success && session ? "Continue" : "Start"}
+        className="rounded-3xl! disabled:cursor-not-allowed!"
         variant="filled"
         suffixIcon={
           status.loading ? (
@@ -54,7 +59,6 @@ export function Intialiize() {
         }
         handleClick={handleClickInitialize}
       />
-      {/* </Link> */}
     </div>
   );
 }

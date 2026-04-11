@@ -6,7 +6,6 @@ export interface Migration {
   version: number;
   name: string;
   up: (db: Database.Database) => void;
-  /** Optional. If present, allows rolling back this migration. */
   down?: (db: Database.Database) => void;
 }
 
@@ -88,6 +87,56 @@ export const migrations: Migration[] = [
       if (!tableInfo.some((c) => c.name === "status")) {
         db.exec(`
             ALTER TABLE tasks ADD COLUMN status TEXT 
+          `);
+      }
+
+      return;
+    },
+  },
+
+  {
+    version: 3,
+    name: "add_column_email_to_users",
+    up(db) {
+      const tbl = db
+        .prepare(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='users'"
+        )
+        .get() as { name?: string } | undefined;
+      if (!tbl?.name) return;
+
+      const tableInfo = db.prepare("PRAGMA table_info(users)").all() as {
+        name: string;
+      }[];
+
+      if (!tableInfo.some((c) => c.name === "email")) {
+        db.exec(`
+            ALTER TABLE users ADD COLUMN email TEXT NOT NULL
+          `);
+      }
+
+      return;
+    },
+  },
+
+  {
+    version: 4,
+    name: "remove_column_password_from_users",
+    up(db) {
+      const tbl = db
+        .prepare(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='users'"
+        )
+        .get() as { name?: string } | undefined;
+      if (!tbl?.name) return;
+
+      const tableInfo = db.prepare("PRAGMA table_info(users)").all() as {
+        name: string;
+      }[];
+
+      if (tableInfo.some((c) => c.name === "password")) {
+        db.exec(`
+            ALTER TABLE users DROP COLUMN password 
           `);
       }
 

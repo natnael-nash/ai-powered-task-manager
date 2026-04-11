@@ -1,12 +1,21 @@
 import { DB_PATH } from "@/lib/database";
 import Database from "better-sqlite3";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session)
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
     const { id } = await params;
     const db = new Database(DB_PATH);
     const body = await request.json();

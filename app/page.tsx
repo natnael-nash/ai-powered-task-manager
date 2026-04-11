@@ -17,6 +17,7 @@ export default function Home() {
             A Task Manager powered by AI automation and integrations. You can
             interact with the interface or simply use the chat.
           </p>
+
           <Intialiize />
         </div>
       </div>

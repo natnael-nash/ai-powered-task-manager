@@ -34,20 +34,22 @@ export function initializeDb(): void {
           created TEXT NOT NULL DEFAULT (datetime('now')),
           updated TEXT NOT NULL DEFAULT (datetime('now')),
           deleted TEXT
-        )
-      `);
+          )
+          `);
 
     // Create users table
     db.exec(`
-        CREATE TABLE IF NOT EXISTS tasks (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          category TEXT,
-          priority TEXT,
-          due_date TEXT,
-          created TEXT NOT NULL DEFAULT (datetime('now')),
-          updated TEXT NOT NULL DEFAULT (datetime('now')),
-          deleted TEXT
+            CREATE TABLE IF NOT EXISTS tasks (
+              id TEXT PRIMARY KEY,
+              title TEXT NOT NULL,
+              category TEXT,
+              priority TEXT,
+              due_date TEXT,
+              created TEXT NOT NULL DEFAULT (datetime('now')),
+              updated TEXT NOT NULL DEFAULT (datetime('now')),
+              deleted TEXT,
+              user_id NOT NULL,
+              FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
         )
       `);
 
