@@ -2,8 +2,7 @@ import { Task } from "@/app/components/TaskList";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey:
-    process.env.GEMINI_API_KEY ?? "AIzaSyCZ22leaLFrEPRka0lEfOB-lCddktu6Ixg",
+  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
 });
 
 type ExtractResult = {
@@ -45,10 +44,11 @@ export async function handleChat(message: string) {
   const extractedData = (await extractAttributesFromContent(
     message,
     ["title", "category", "priority", "dueDate", "reminderTime", "status"],
-    process.env.GEMINI_MODEL
+    process.env.NEXT_PUBLIC_GEMINI_MODEL
   )) as any;
-  const create = await createTask(extractedData?.data);
-  return extractedData;
+  const { title, ...taskData } = extractedData?.data;
+  const create = await createTask({ ...taskData, title: title ?? message });
+  return { data: { ...extractedData, title: title ?? message }, success: true };
 }
 
 export async function extractAttributesFromContent(

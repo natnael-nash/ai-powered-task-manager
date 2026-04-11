@@ -95,8 +95,16 @@ export default function ChatInterface({ id }: { id?: string }) {
                 messages.length > 1 ? (
                 <div className="flex flex-col">
                   <h2 className="flex font-bold justify-between gap-2">
-                    Creating task{" "}
-                    <Loader className="w-4 h-4 animate-spin mt-1" />
+                    <span>
+                      {loading ? (
+                        <span>
+                          Creating task
+                          <Loader className="w-4 h-4 animate-spin mt-1" />
+                        </span>
+                      ) : (
+                        <span>Created</span>
+                      )}
+                    </span>
                   </h2>
                   <div className="pt-2">
                     {Object.entries(extracted || {}).map(([key, value]) => (
