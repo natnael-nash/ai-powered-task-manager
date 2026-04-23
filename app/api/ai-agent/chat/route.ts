@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
   )) as any;
   const { title, ...taskData } = extractedData?.data;
   const task =
-    extractedData.intent == "edit" || taskId
+    extractedData.intent == "edit" && taskId
       ? await updateTaskTool(
           taskId,
           {
