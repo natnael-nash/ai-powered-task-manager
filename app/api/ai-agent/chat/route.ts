@@ -1,5 +1,7 @@
 import { Task } from "@/app/components/TaskList";
+import { authOptions } from "@/lib/auth";
 import { GoogleGenAI } from "@google/genai";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -48,34 +50,6 @@ function buildSchema(attributes: string[]) {
     required: ["success", "data", "intent"],
     additionalProperties: false,
   } as const;
-}
-export async function POST(request: NextRequest) {
-  const { prompt: message } = await request.json();
-  const extractedData = (await extractAttributesFromContent(
-    message,
-    [
-      "title",
-      "category",
-      "priority",
-      "dueDate",
-      "reminderTime",
-      "status",
-      "description",
-    ],
-    process.env.GEMINI_MODEL
-  )) as any;
-  const { title, ...taskData } = extractedData?.data;
-  const create = await createTask(extractedData.intent, {
-    ...taskData,
-    title: title ?? message,
-  });
-  return NextResponse.json(
-    {
-      data: { ...extractedData, title: title ?? message },
-      success: true,
-    },
-    { status: 201 }
-  );
 }
 
 export async function extractAttributesFromContent(
@@ -152,4 +126,40 @@ export async function createTask(intent: string, data: Task) {
     body: JSON.stringify(data),
   });
   return taskCreate;
+}
+
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session)
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+
+  const { prompt: message } = await request.json();
+  const extractedData = (await extractAttributesFromContent(
+    message,
+    [
+      "title",
+      "category",
+      "priority",
+      "dueDate",
+      "reminderTime",
+      "status",
+      "description",
+    ],
+    process.env.GEMINI_MODEL
+  )) as any;
+  const { title, ...taskData } = extractedData?.data;
+  const create = await createTask(extractedData.intent, {
+    ...taskData,
+    title: title ?? message,
+  });
+  return NextResponse.json(
+    {
+      data: { ...extractedData, title: title ?? message },
+      success: true,
+    },
+    { status: 201 }
+  );
 }
