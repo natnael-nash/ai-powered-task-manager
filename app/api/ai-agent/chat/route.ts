@@ -1,6 +1,11 @@
 import { Task } from "@/app/components/TaskList";
 import { authOptions } from "@/lib/auth";
+import { DB_PATH } from "@/lib/database";
 import { GoogleGenAI } from "@google/genai";
+import Database from "better-sqlite3";
+import { randomUUID } from "crypto";
+import { Session } from "inspector/promises";
+
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -120,12 +125,97 @@ export async function extractAttributesFromContent(
   }
 }
 
-export async function createTask(intent: string, data: Task) {
-  const taskCreate = fetch("/api/task", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-  return taskCreate;
+//create task tool
+export async function createTaskTool(data: Task, user: { email: string }) {
+  try {
+    const db = new Database(DB_PATH);
+    const body = data ?? {};
+    const {
+      title,
+      category,
+      priority,
+      due_date: dueDate,
+      reminder_time: reminderTime,
+      description,
+      note,
+      status,
+    } = body;
+    const id = randomUUID();
+
+    const currentUser = db
+      .prepare(`SELECT id FROM users where email = ?`)
+      .get(user.email) as { id: string };
+
+    const task = await db
+      .prepare(
+        `INSERT INTO tasks (id, user_id, title, category, priority, due_date, description, reminder_time, note, status, created, updated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`
+      )
+      .get(
+        id,
+        currentUser.id,
+        title,
+        category,
+        priority,
+        dueDate,
+        description,
+        reminderTime,
+        note,
+        status
+      );
+
+    db.close();
+    return task;
+  } catch (error) {
+    console.log("@here error", error);
+    return null;
+  }
+}
+
+//update task tool
+export async function updateTaskTool(
+  taskId: string,
+  data: Task,
+  user: { email: string }
+) {
+  console.log("\n\n ⬆️Updating⬆️\n", taskId);
+  try {
+    const db = new Database(DB_PATH);
+    const body = data ?? {};
+    const {
+      title,
+      category,
+      priority,
+      due_date: dueDate,
+      reminder_time: reminderTime,
+      description,
+      note,
+      status,
+    } = body;
+
+    const task = await db
+      .prepare(
+        `UPDATE tasks SET title=?, category=?, priority=?, due_date=?, description=?, reminder_time=?, 
+        note=?, status=?, updated=datetime('now') WHERE id = ? RETURNING *`
+      )
+      .get(
+        title,
+        category,
+        priority,
+        dueDate,
+        description,
+        reminderTime,
+        note,
+        status,
+        taskId
+      );
+
+    db.close();
+    return task;
+  } catch (error) {
+    console.log("@here error", error);
+    return null;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -136,7 +226,7 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     );
 
-  const { prompt: message } = await request.json();
+  const { prompt: message, taskId } = await request.json();
   const extractedData = (await extractAttributesFromContent(
     message,
     [
@@ -151,13 +241,29 @@ export async function POST(request: NextRequest) {
     process.env.GEMINI_MODEL
   )) as any;
   const { title, ...taskData } = extractedData?.data;
-  const create = await createTask(extractedData.intent, {
-    ...taskData,
-    title: title ?? message,
-  });
+  const task =
+    extractedData.intent == "edit" || taskId
+      ? await updateTaskTool(
+          taskId,
+          {
+            ...taskData,
+            title: title ?? message,
+          },
+          { email: session?.user?.email ?? "" }
+        )
+      : await createTaskTool(
+          {
+            ...taskData,
+            title: title ?? message,
+          },
+          { email: session?.user?.email ?? "" }
+        );
   return NextResponse.json(
     {
-      data: { ...extractedData, title: title ?? message },
+      data: {
+        data: { ...extractedData.data, ...(task ?? {}) },
+        title: title ?? message,
+      },
       success: true,
     },
     { status: 201 }
