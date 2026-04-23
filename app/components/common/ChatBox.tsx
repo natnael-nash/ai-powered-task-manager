@@ -1,5 +1,4 @@
-// "use client";
-import { handleChat } from "@/lib/ai-agent";
+// import { handleChat } from "@/lib/ai-agent";
 import { Dot, Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 import { playSuccess } from "simple-notification-sounds";
@@ -30,9 +29,12 @@ export default function ChatInterface({ id }: { id?: string }) {
     setLoading(true);
     setInput("");
 
-    const res = await handleChat(trimmed);
-    if (res.success) {
-      const resData = res.data;
+    const res = await fetch(`/api/ai-agent/chat`, {
+      method: "POST",
+      body: JSON.stringify({ prompt: trimmed }),
+    });
+    if (res.ok) {
+      const resData = await res.json();
       const data = resData.data as Task;
 
       console.log("@here update", messages);
