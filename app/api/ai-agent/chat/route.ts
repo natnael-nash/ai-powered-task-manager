@@ -4,7 +4,6 @@ import { DB_PATH } from "@/lib/database";
 import { GoogleGenAI } from "@google/genai";
 import Database from "better-sqlite3";
 import { randomUUID } from "crypto";
-import { Session } from "inspector/promises";
 
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
