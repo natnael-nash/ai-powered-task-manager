@@ -141,7 +141,7 @@ export default function TaskList() {
                             >
                               <p className="py-2">{task.status} </p>
                               <span>
-                                {task?.status.toLowerCase() == "completed" ? (
+                                {task?.status?.toLowerCase() == "completed" ? (
                                   <CheckCircle className="w-4 h-4 mt-0.5 text-green-600" />
                                 ) : (
                                   <label
@@ -233,7 +233,7 @@ export default function TaskList() {
                         <div className="mt-2 inline-flex gap-2 rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-900">
                           <p className="">{selected?.status}</p>
                           <span>
-                            {selected?.status.toLowerCase() == "completed" ? (
+                            {selected?.status?.toLowerCase() == "completed" ? (
                               <CheckCircle className="w-4 h-4 mt-0.5 text-green-600" />
                             ) : (
                               <label

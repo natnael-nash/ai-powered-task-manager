@@ -14,6 +14,7 @@ export default function ChatInterface({ id }: { id?: string }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [lastTask, setTask] = useState<number | null>();
   // const [extracted, setExtracted] = useState<Task | null>(null);
 
   const handleSend = async () => {
@@ -31,28 +32,23 @@ export default function ChatInterface({ id }: { id?: string }) {
 
     const res = await fetch(`/api/ai-agent/chat`, {
       method: "POST",
-      body: JSON.stringify({ prompt: trimmed }),
+      body: JSON.stringify({ prompt: trimmed, taskId: lastTask }),
     });
     if (res.ok) {
       const resData = await res.json();
-      const data = resData.data as Task;
+      const data = resData.data.data as Task;
+      setTask(data.id);
 
       console.log("@here update", messages);
-      // setExtracted(data);
-      setMessages((prev) => {
-        // const prevMessages = prev;
-        // prevMessages.pop();
-        prev.pop();
-        console.log("update", prev);
-        return [
-          ...prev,
-          {
-            id: `${prev.length - 1}`,
-            role: "assistant",
-            content: data,
-          },
-        ];
-      });
+
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        {
+          id: `${prev.length - 1}`,
+          role: "assistant",
+          content: data,
+        },
+      ]);
       setLoading(false);
     } else {
       setLoading(false);
