@@ -11,8 +11,6 @@ export default function SideNav() {
     { quote: string; author: string } | undefined
   >();
 
-  if (pathname == "/") return;
-
   const getGreeting = (date: Date = new Date()) => {
     const hour = date.getHours();
 
@@ -32,9 +30,9 @@ export default function SideNav() {
   };
 
   useEffect(() => {
-    fetchQuote();
+    if (pathname !== "/") fetchQuote();
   }, []);
-
+  if (pathname == "/") return null;
   return (
     <div className="lg:w-1/4 py-5 flex flex-col gap-4 pr-5">
       <h1 className="lg:max-w-xs text-3xl font-semibold leading-10 tracking-tight text-zinc-600">
