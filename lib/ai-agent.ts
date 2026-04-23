@@ -1,9 +1,12 @@
 import { Task } from "@/app/components/TaskList";
 import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
 
-const ai = new GoogleGenAI({
+const ai_client = new GoogleGenAI({
   apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
 });
+
+const chatIds: string[] = [];
 
 type ExtractResult = {
   success: boolean;
@@ -35,6 +38,10 @@ function buildSchema(attributes: string[]) {
         required: attributes,
         additionalProperties: false,
       },
+      intent: {
+        type: z.enum(["edit_previous", "new"]),
+        description: "new by default",
+      },
     },
     required: ["success", "data"],
     additionalProperties: false,
@@ -43,11 +50,22 @@ function buildSchema(attributes: string[]) {
 export async function handleChat(message: string) {
   const extractedData = (await extractAttributesFromContent(
     message,
-    ["title", "category", "priority", "dueDate", "reminderTime", "status"],
+    [
+      "title",
+      "category",
+      "priority",
+      "dueDate",
+      "reminderTime",
+      "status",
+      "description",
+    ],
     process.env.NEXT_PUBLIC_GEMINI_MODEL
   )) as any;
   const { title, ...taskData } = extractedData?.data;
-  const create = await createTask({ ...taskData, title: title ?? message });
+  const create = await createTask(extractedData.intent, {
+    ...taskData,
+    title: title ?? message,
+  });
   return { data: { ...extractedData, title: title ?? message }, success: true };
 }
 
@@ -57,24 +75,54 @@ export async function extractAttributesFromContent(
   model = "gemini-3-flash-preview"
 ): Promise<ExtractResult> {
   try {
-    const response = await ai.models.generateContent({
+    // const response = await ai_client.models.generateContent({
+    //   model,
+    //   contents: content,
+    //   config: {
+    //     systemInstruction:
+    //       "You extract structured data from user messages. " +
+    //       "Return only the requested fields. " +
+    //       "If a field is missing, return null for that field.",
+    //     responseMimeType: "application/json",
+    //     responseJsonSchema: buildSchema(attributes),
+    //   },
+    // });
+
+    // const text= response.text;
+
+    const response = await ai_client.interactions.create({
       model,
-      contents: content,
-      config: {
-        systemInstruction:
-          "You extract structured data from user messages. " +
-          "Return only the requested fields. " +
-          "If a field is missing, return null for that field.",
-        responseMimeType: "application/json",
-        responseJsonSchema: buildSchema(attributes),
-      },
+      input: [
+        {
+          role: "user",
+          content,
+        },
+      ],
+      previous_interaction_id: chatIds.pop(),
+      system_instruction:
+        "You extract structured data from user messages. " +
+        "Return only the requested fields. " +
+        "If a field is missing, return null for that field.",
+      response_mime_type: "application/json",
+      response_format: buildSchema(attributes),
     });
 
-    const parsed = JSON.parse(response.text ?? "{}") as {
+    console.log("\n\n@here response🤖", response, chatIds, "\n");
+    const outputs = response.outputs;
+    const lastOutput = outputs?.pop();
+    const text = lastOutput?.type == "text" ? lastOutput.text : "";
+    chatIds.push(response.id);
+
+    // ??response
+    //   ? response.outputs[response.outputs.length - 1].text
+    //   : "";
+
+    const parsed = JSON.parse(text ?? "{}") as {
       success?: boolean;
       data?: Record<string, string | null>;
+      intent?: "new" | "edit_previous";
     };
-
+    console.log("@here parsed", parsed);
     return {
       success: true,
       data: parsed.data ?? null,
@@ -88,7 +136,7 @@ export async function extractAttributesFromContent(
   }
 }
 
-export async function createTask(data: Task) {
+export async function createTask(intent: string, data: Task) {
   const taskCreat = fetch("/api/task", {
     method: "POST",
     body: JSON.stringify(data),
