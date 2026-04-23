@@ -8,14 +8,14 @@ import { Task } from "../TaskList";
 type Message = {
   id: string;
   role: "user" | "assistant";
-  text: string;
+  content: string | Task;
 };
 
 export default function ChatInterface({ id }: { id?: string }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [extracted, setExtracted] = useState<Task | null>(null);
+  // const [extracted, setExtracted] = useState<Task | null>(null);
 
   const handleSend = async () => {
     const trimmed = input.trim();
@@ -24,27 +24,47 @@ export default function ChatInterface({ id }: { id?: string }) {
     playSuccess();
     setMessages((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), role: "user", text: trimmed },
-      { id: `${prev.length + 1}`, role: "assistant", text: "" },
+      { id: crypto.randomUUID(), role: "user", content: trimmed },
+      { id: `${prev.length + 1}`, role: "assistant", content: "" },
     ]);
     setLoading(true);
     setInput("");
 
     const res = await handleChat(trimmed);
     if (res.success) {
-      const data = res.data as Task;
-      setExtracted(data);
+      const resData = res.data;
+      const data = resData.data as Task;
+
+      console.log("@here update", messages);
+      // setExtracted(data);
+      setMessages((prev) => {
+        // const prevMessages = prev;
+        // prevMessages.pop();
+        prev.pop();
+        console.log("update", prev);
+        return [
+          ...prev,
+          {
+            id: `${prev.length - 1}`,
+            role: "assistant",
+            content: data,
+          },
+        ];
+      });
       setLoading(false);
     } else {
       setLoading(false);
     }
-    console.log("@here res", res);
   };
 
   useEffect(() => {
     setTimeout(() => {
       setMessages([
-        { id: "1", role: "assistant", text: "Hi! How can I help you today?" },
+        {
+          id: "1",
+          role: "assistant",
+          content: "Hi! I can create you a task by just chatting to me?",
+        },
       ]);
     }, 200);
   }, []);
@@ -66,60 +86,74 @@ export default function ChatInterface({ id }: { id?: string }) {
               message.role === "user" ? "justify-end" : "justify-start"
             }`}
           >
-            <div
-              className={`max-w-[75%] rounded-xl  px-4 py-3 text-sm leading-relaxed ${
-                message.role === "user"
-                  ? "bg-slate-900 text-white rounded-br-none"
-                  : "bg-slate-100 text-slate-900 rounded-bl-none"
-              }`}
-            >
-              {message.role === "assistant" &&
-              loading &&
-              index === messages.length - 1 ? (
-                <div className="flex -mb-1! pt-1">
-                  <Dot
-                    className="text-blue-500 animate-bounce"
-                    style={{ animationDelay: "0ms" }}
-                  />
-                  <Dot
-                    className="text-blue-500 animate-bounce"
-                    style={{ animationDelay: "150ms" }}
-                  />
-                  <Dot
-                    className="text-blue-500 animate-bounce"
-                    style={{ animationDelay: "300ms" }}
-                  />
-                </div>
-              ) : !loading &&
-                index === messages.length - 1 &&
-                messages.length > 1 ? (
-                <div className="flex flex-col">
-                  <h2 className="flex font-bold justify-between gap-2">
-                    <span>
-                      {loading ? (
-                        <span>
-                          Creating task
-                          <Loader className="w-4 h-4 animate-spin mt-1" />
-                        </span>
-                      ) : (
-                        <span>Created</span>
-                      )}
-                    </span>
-                  </h2>
-                  <div className="pt-2">
-                    {Object.entries(extracted || {}).map(([key, value]) => (
-                      <div key={key}>
-                        <strong>{key}:</strong> {String(value)}
-                      </div>
-                    ))}
+            {
+              <div
+                className={`max-w-[60%] rounded-xl  px-4 py-3 text-sm leading-relaxed ${
+                  message.role === "user"
+                    ? "bg-slate-900 text-white rounded-br-none"
+                    : "bg-slate-100 text-slate-900 rounded-bl-none"
+                }`}
+              >
+                {message.role === "assistant" &&
+                loading &&
+                index === messages.length - 1 ? (
+                  <div className="flex -mb-1! pt-1">
+                    <Dot
+                      className="text-blue-500 animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    />
+                    <Dot
+                      className="text-blue-500 animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    />
+                    <Dot
+                      className="text-blue-500 animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    />
                   </div>
-                  {/* <Button type="ok" label="Ok"/> */}
-                  {/* {extracted} */}
-                </div>
-              ) : (
-                message.text
-              )}
-            </div>
+                ) : !loading &&
+                  index === messages.length - 1 &&
+                  messages.length > 1 ? (
+                  <div className="flex flex-col">
+                    <h2 className="flex font-bold justify-between gap-2">
+                      <span>
+                        {loading ? (
+                          <span>
+                            Creating task
+                            <Loader className="w-4 h-4 animate-spin mt-1" />
+                          </span>
+                        ) : (
+                          <span>Created</span>
+                        )}
+                      </span>
+                    </h2>
+                    <div className="pt-2">
+                      {Object.entries(message.content || {}).map(
+                        ([key, value]) => (
+                          <div key={key}>
+                            <strong>{key}:</strong> {String(value)}
+                          </div>
+                        )
+                      )}
+                    </div>
+                    {/* <Button type="ok" label="Ok"/> */}
+                    {/* {message} */}
+                  </div>
+                ) : typeof message?.content == "string" ? (
+                  message.content
+                ) : (
+                  <div className="pt-2">
+                    {Object.entries(message.content || {}).map(
+                      ([key, value]) => (
+                        <div key={key}>
+                          <strong>{key}:</strong> {String(value)}
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            }
           </div>
         ))}
       </div>

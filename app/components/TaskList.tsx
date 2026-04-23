@@ -98,7 +98,7 @@ export default function TaskList() {
       ) : (
         <section className="w-full">
           {tasks.data.length ? (
-            <div className="w-full rounded-2xl bg-white p-6 flex flex-row justify-start">
+            <div className="w-full rounded-2xl bg-white p-6 flex flex-row justify-start max-h-[80vh] overflow-auto">
               <div className="flex flex-1">
                 <div className="space-y-3 w-full delay-75">
                   {tasks.data.map((task) => (
